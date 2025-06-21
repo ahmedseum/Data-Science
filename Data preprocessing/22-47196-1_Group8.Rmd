@@ -1,0 +1,193 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+```{r}
+# Read CSV from a URL
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+install.packages("gridExtra")
+
+url <- "https://drive.google.com/uc?export=download&id=12TFC8CVfBTI2uSZfagg5Q2IDg0uqlAg2"
+car_data <- read.csv(url)
+
+# View first fiew rows
+head(car_data)
+
+```
+```{r}
+summary(car_data)
+#Summering in statistical format 
+```
+```{r}
+#calling the library
+
+library(ggplot2)
+library(gridExtra)
+
+#Plotting univariable 
+
+plot1 <- ggplot(car_data,aes(x=price))+ geom_histogram(binwidth=2000,fill='blue',color="black",alpha=0.7)+
+  labs(title="Histogram of Prices", x="Price", y="Frequency" ) 
+
+plot2 <- ggplot(car_data,aes(x=milage))+ geom_histogram(binwidth=2000,fill='red',color="black",alpha=0.7)+
+  labs(title="Histogram of Milage", x="Milage", y="Frequency" ) 
+
+
+
+grid.arrange(plot1,plot2, ncol=2) 
+#Pairing two plot
+    
+```
+```{r}
+library(gridExtra)
+#calling the library
+#Univariable Plotting
+
+plot1 <- ggplot(data=car_data, aes(x=brand))+geom_bar(binwidth = 200,fill="red" , color = "black", alpha = .5)+labs(title="Brand vs Frequency",x = "Brand",x="Frequency")
+
+plot2 <- ggplot(data=car_data, aes(x=model))+geom_bar(binwidth = 200,fill="green" , color = "black", alpha = .5)+labs(title="Model vs Frequency",x = "Model",x="Frequency")
+
+plot3 <- ggplot(data=car_data, aes(x=fuel_type))+geom_bar(binwidth = 200,fill="lightblue" , color = "black", alpha = .5)+labs(title="Fuel Type vs Frequency",x = "Fuel Type",x="Frequency")
+
+plot4 <- ggplot(data=car_data, aes(x=transmission))+geom_bar(binwidth = 200,fill="purple" , color = "black", alpha = .5)+labs(title="Transmission vs Frequency",x = "Transmission",x="Frequency")
+
+plot5 <- ggplot(data=car_data, aes(x=ext_col))+geom_bar(binwidth = 200,fill="orange" , color = "black", alpha = .5)+labs(title="Ext_col vs Frequency",x = "EXT_COL",x="Frequency")
+
+plot6 <- ggplot(data=car_data, aes(x=int_col))+geom_bar(binwidth = 200,fill="yellow" , color = "black", alpha = .5)+labs(title="Int_col vs Frequency",x = "INT_COL",x="Frequency")
+
+plot7 <- ggplot(data=car_data, aes(x=accident))+geom_bar(binwidth = 200,fill="pink" , color = "black", alpha = .5)+labs(title="Accident vs Frequency",x = "Accident",x="Frequency")
+
+grid.arrange(plot1, plot2, plot3, plot4, plot5,plot6,plot7, ncol = 3) #Pairing plot
+
+```
+```{r}
+plot1 <- ggplot(data=car_data,aes(y=price))+geom_boxplot(binwidth=20,fill="blue",color="black",alpha=0.6)+labs(title="Box Plot of Price",y="Price")
+
+plot2 <- ggplot(data=car_data,aes(y=milage))+geom_boxplot(binwidth=20,fill="red",color="black",alpha=0.6)+labs(title="Box Plot of Milage",y="Milage")
+
+# Plotting bar chart to identify over fitting  
+
+grid.arrange(plot1,plot2,ncol=2)
+
+
+```
+```{r}
+```
+
+
+```{r}
+ggplot(data=car_data,aes(x=milage,y=price))+geom_point(color="red",alpha=0.5)+geom_smooth(method="lm", se=FALSE)+labs(title = "Scatter Plot of Milage and Price",X="Milage", Y="Price")
+
+#multivariable plotting 
+
+```
+```{r}
+cor(car_data$milage, car_data$price)
+#co-relation between milage and price
+```
+
+
+```{r}
+boxplot(car_data$price ~ accident , data=car_data,
+        main="Box Plot of Petal Length by Species",
+        col=c("red","green","yellow"))
+#table(car_data$clean_title)
+
+#multi-variable plotting
+
+hist(table(car_data$clean_title))
+```
+
+
+
+```{r}
+#Finding median
+
+med<- median(car_data$price)
+print(min(car_data$price))
+#car_data[car_data$price>500000,]
+sub_data <- car_data
+sub_data[sub_data$id[220],] <- median(car_data$price) #assigning value
+#Printing previous data
+print("Previous data")
+car_data$price[car_data$id[220]]
+
+
+print("New Data")
+sub_data$price[sub_data$id[220]]
+
+print("median: ", str(median))
+
+```
+```{r}
+refine_data <- car_data[car_data$price <=85000,]
+
+refine_data <- refine_data[refine_data$milage <=200000,]
+
+plot1 <- ggplot(data=refine_data,aes(y=price))+geom_boxplot(binwidth=20,fill="blue",color="black",alpha=0.6)+labs(title="Box Plot of Price",y="Price")
+
+plot2 <- ggplot(data=refine_data,aes(y=milage))+geom_boxplot(binwidth=20,fill="red",color="black",alpha=0.6)+labs(title="Box Plot of Milage",y="Milage")
+
+#ploting after reving over fitting
+
+grid.arrange(plot1,plot2 ,ncol=2)
+
+```
+```{r}
+# as the formation of the Engine column is not as accepted we can remove this entire column also [model year,transmission,clean]  
+refine_data$engine <- NULL
+refine_data$model_year <- NULL
+refine_data$engine <- NULL
+refine_data$transmission <- NULL
+refine_data$clean_title <- NULL
+head(refine_data)
+
+```
+
+```{r}
+#table(refine_data$int_col)
+freq_table <- table(refine_data$int_col)
+
+value <- names(freq_table[freq_table > 5])
+refine_data <- refine_data[refine_data$int_col %in% value, ]
+#table(refine_data$int_col)
+
+refine_data$color_numeric <- as.numeric(factor(refine_data$int_col))
+table(refine_data$color_numeric)
+table(refine_data$int_col)
+
+#encoding the interior colore data
+
+
+```
+```{r}
+ggplot(data=refine_data,aes(x=milage,y=price))+geom_point(alpha=0.5)+geom_smooth(method="lm", se=FALSE)+labs(title = "Scatter Plot of Milage and Price",X="Milage", Y="Price")
+
+#plotting after removing over fitting 
+
+```
+```{r}
+library(ggplot2)
+library(gridExtra)
+plot1 <- ggplot(refine_data,aes(x=price))+ geom_histogram(binwidth=2000,fill='blue',color="black",alpha=0.7)+
+  labs(title="Histogram of Prices", x="Price", y="Frequency" ) 
+
+plot2 <- ggplot(refine_data,aes(x=milage))+ geom_histogram(binwidth=2000,fill='red',color="black",alpha=0.7)+
+  labs(title="Histogram of Milage", x="Milage", y="Frequency" ) 
+
+grid.arrange(plot1,plot2, ncol=2)
+# plotiing after removing over fitting
+```
+
+```{r}
+boxplot(refine_data$price ~ accident , data=refine_data,
+        main="Box Plot of Petal Length by Species",
+        col=c("red","green","yellow"))
+# bar plot after removing over fitting
+
+```
+
